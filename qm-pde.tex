@@ -1,0 +1,496 @@
+\documentclass[a4paper,12pt]{report}
+\usepackage{booktabs}
+\usepackage[margin=1in]{geometry}
+\usepackage{listings} % For including cODE
+\lstset{ 
+  language=Python, % Specify the language
+  basicstyle=\ttfamily\small, % Font style
+  keywordstyle=\bfseries\color{blue}, % Keywords style
+  commentstyle=\itshape\color{gray}, % Comments style
+  stringstyle=\color{red}, % Strings style
+  numbers=left, % Line numbers
+  numberstyle=\tiny, % Line number font size
+  stepnumber=1, % Step for line numbers
+  breaklines=true, % Line breaking
+  frame=single % Frame around cODE
+}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{xcolor}
+\definecolor{darkgreen}{rgb}{0.0, 0.5, 0.0}
+\usepackage{hyperref}
+%\usepackage{fdsymbol}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{calligra}
+\usepackage{calrsfs}
+\usepackage{pifont}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\newtheorem{theorem}{Theorem}[section]   
+\newtheorem{corollary}{Corollary}[section] 
+\newtheorem{lemma}{Lemma}[section]         
+\newtheorem{definition}{Definition}[section] 
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{example}{example}[section]
+\newtheorem{remark}{Remark}[section]
+\title{6300 final report}
+\author{Yutan Zhang}
+\date{October 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Abstract}
+\hspace*{1.5em}This paper derives key results of quantum mechanics by solving the time-dependent Schrödinger equation in various physical contexts. We first establish the fundamental Schrödinger kernel as the Green’s function for the free-particle Schrödinger equation in \( \mathbb{R}^n \), using Fourier transform methods. Next, we extend the analysis to include potentials, beginning with the harmonic oscillator, where separation of variables reveals Hermite polynomials as eigenfunctions with quantized energy levels. We proceed to the hydrogen atom, employing spherical symmetry and separation of variables to solve the Schrödinger equation with Coulomb potential. The radial wave function is found to decay exponentially, yielding discrete energy levels consistent with known quantum states. Analytical techniques, including power series expansions and special function theory, underpin the derivations, providing a coherent framework for understanding quantum wave behavior in these classical models.
+\section{Introduction}
+\hspace*{1.5em}The wave equation of a particle is in the form
+\[\varphi(\vec{x}, \vec{t}): \mathbb{R}_x^n \times \mathbb{R}_t^n \to \mathbb{C} \tag{1}\]
+where \(\vec{x}\) represents the position of the particle, and \(\vec{t}\) represents time. 
+\footnote{The general formula for the time variable is indeed in the domain \(\mathbb{R}^n\), though not to be discussed in this report. }
+The value \(\varphi \in \mathbb{C}\) does not have physical interpretations, but the square of its length defines a probability distribution. Specifically, for any subspace \(\Omega \subset \mathbb{R}_x^n\), we have 
+\[\int_{\Omega} \varphi(\vec{x}, \vec{t}) d\vec{x} = \mathbb{P}(\vec{x} \in \Omega \text{ at time } \vec{t}) \tag{2}\]
+which is the probability that the particle stays in \(\Omega\) at time \(t\), and therefore 
+\[\int_{\mathbb{R}^n} \varphi(\vec{x}, \vec{t}) d\vec{x} = 1\]
+and after taking the Fourier transform of \(\varphi\), we get 
+\[\hat{\varphi}(\vec{\zeta}, \vec{t}) = \frac{1}{(2\pi)^{\frac{n}{2}}} \int_{\mathbb{R}^n} e^{-i\vec{x} \cdot \vec{\zeta}} f(\vec{x}) d\vec{x} \tag{3}\]
+where \(\hat{\varphi}\) describes the distribution of momentum, that  \[\int_{\Omega} \hat{\varphi}(\vec{\zeta}, \vec{t}) d\vec{\zeta} = \mathbb{P} (\vec{\zeta} \in \Omega \text{ at time } t),\]
+which is the probability that the momentum of the particle is in \(\Omega\) at time \(t\), and therefore 
+\[\int_{\mathbb{R}^n} \hat{\varphi}(\vec{\zeta}, \vec{t}) d\vec{\zeta} = 1 \]
+
+Let
+\[
+K_t(\vec{x}) = \frac{1}{(4\pi it)^{\frac{n}{2}}} e^{i \frac{|\vec{x}|^2}{4t}}, \quad \vec{x} \in \mathbb{R}^n, \, t \in \mathbb{R}, \, t \neq 0. \tag{4}
+\]
+which is the Schr\"odinger kernel. We will demonstrate the construction of the Schr\"odinger kernel later. 
+
+A direct computation of Fourier transform shows that \footnote{Taking Fourier transform for some function \(f(\vec{x})\) is in the form 
+\[\hat{f}(\vec{\zeta}) = [\mathcal{F}f](\vec{\zeta}) = \frac{1}{(2\pi)^{\frac{n}{2}}} \int_{\mathbb{R}^n} e^{-i \vec{x} \cdot \vec{\zeta} } d\vec{x}\]
+and therefore taking inverse Fourier transform is in the form 
+\[[\mathcal{F}^{-1}f](\vec{x}) = \frac{1}{(2\pi)^{\frac{n}{2}}} \int_{\mathbb{R}^n} e^{i \vec{x} \cdot \vec{\zeta} } d\vec{\zeta}\]}
+\[\widehat{K_t}(\boldsymbol{\xi}) = e^{-it|\boldsymbol{\xi}|^2} \tag{5}\]
+
+There are many types of Schr\"odinger equations, for example, time-dependent Schrödinger equation
+    \[
+        i\hbar \frac{\partial \psi(x,t)}{\partial t} = \hat{H}\psi(x,t)
+    \]
+where \(\hat{H}\) is the Hamiltonian, which is an operator, not necessarily linear, on \(\varphi\), with various forms depending on the physical setup, time-independent Schrödinger equation
+    \[
+        \hat{H}\psi(x) = E\psi(x)
+    \]
+where \(E\) can be interpreted as the eigenvalue, its physical interpretation is that when the energy \(E\) is an eigenvalue, the state is stable; and multi-particle Schrödinger equation
+    \[
+        i\hbar \frac{\partial \vec{\varphi}(\vec{r}_1, \vec{r}_2, \dots, t)}{\partial t} = \hat{H}\vec{\varphi}(\vec{r}_1, \vec{r}_2, \dots, t),
+    \]
+etc. 
+
+\section{Preliminaries}
+A partial differential equation (PDE) is an equation involving an unknown function of \textcolor{darkgreen}{two or more} variables and certain of its partial derivatives. \footnote{We need two or more variables because we can only have partial derivatives in multi-variable functions.}\\
+\begin{definition}[PDE]
+Let \(k \geq 0\) be an integer, and let \(U\) be an open subset of \(\mathbb{R}^n\). An equation of the form
+\[F(D^k u(x), D^{k-1} u(x), ...,  Du(x), u(x), x) = 0 \quad (x\in U)\tag{6}\]  
+\footnote{Multi-index notation: \\
+1. A vector of the form \(\alpha = (\alpha_1, \alpha_2, ..., \alpha_n)\), where each component \(\alpha_i\) is a non-negative integer, is a multi-index of order 
+\[|\alpha| = \sum_{i=1}^n \alpha_i.\]
+2. Given a multi-index \(\alpha\), define 
+\[D^{\alpha}u(x) = \frac{\partial^{|\alpha|} u(x)}{\partial^{\alpha_1} x_1 ... \partial^{\alpha_n} x_n} = \partial^{\alpha_1} x_1 ... \partial^{\alpha_n} x_n u\]
+3. If \(k\) is a non-negative integer, define 
+\[D^k u(x) = \{D^{\alpha}u(x)||\alpha| = k\},\] the set of all partial derivatives of order \(k\); \textcolor{darkgreen}{assign some ordering to those partial derivatives, we can regard \(D^k u(x)\) as a point in \(\mathbb{R}^{n^k}\)}. \\ 
+Define
+\[|D^k u| = (\sum_{|\alpha| = k} |D^{\alpha} u|^2)^{1/2}.\]
+4. Special cases: If \(k = 1\), regard the elements of \(Du\) as being arranged in a vector: \[Du = (u_{x_1}, ..., u_{x_k}) = \text{gradient vector}\]
+If \(k = 2\), regard the elements of \(D^2 u\) as being arranged in a matrix: \[D^2 u = 
+\begin{bmatrix}
+    \frac{\partial^2 u}{\partial x^2_1} & ... & \frac{\partial^2 u}{\partial x_1 \partial x_n} \\
+    & ... &  \\
+    \frac{\partial^2 u}{\partial x_n \partial x_1} & ... & \frac{\partial^2 u}{\partial x^2_n}
+\end{bmatrix} = \text{Hessian matrix}\]
+5. \(\bigtriangledown u = \sum_{i = 1}^{n} u_{x_i x_i} = trD^2 u = \text{Laplacian of }u.\)
+}  is a \(k\)-th order partial differential equation, where \[F: \mathbb{R}^{n^k} \times \mathbb{R}^{n^{k-1}} \times ... \times \mathbb{R}^{n} \times \mathbb{R} \times U \to \mathbb{R}. \]
+is a given function, and \[u: U \to \mathbb{R}\] is the unknown function. 
+\end{definition}
+A system of partial differential equations is a collection of PDEs for several unknown functions. 
+\begin{definition}
+An expression of the form
+\[
+\vec{F}\left(D^k \vec{u}(x), D^{k-1} \vec{u}(x), \ldots, D \vec{u}(x), \vec{u}(x), x\right) = 0 \quad (x \in U)
+\tag{7}\]
+is called a \textit{\(k\)th-order system of partial differential equations}, where
+\[
+\vec{F} : \mathbb{R}^{mn^k} \times \mathbb{R}^{mn^{k-1}} \times \cdots \times \mathbb{R}^{mn} \times \mathbb{R}^m \times U \to \mathbb{R}^m
+\]
+is a given function and
+\[
+\vec{u} : U \to \mathbb{R}^m, \quad \vec{u} = (u^1, \ldots, u^m)
+\]
+is the unknown vector-valued function.
+\end{definition}
+\section{Derivations}
+\subsection{Part I}
+
+\hspace*{1.5em}The Schrödinger kernel \( K_t(\vec{x}) \) is derived as the fundamental solution to the free Schrödinger equation
+\[
+i \frac{\partial \psi}{\partial t} + \Delta \psi = 0
+\]
+where \( \Delta \) is the Laplace operator in \( \mathbb{R}^n \), not including \(t\). 
+
+By Fourier transform, we get
+\[
+\hat{\psi}(\vec{k}, t) = \int_{\mathbb{R}^n} e^{-i \vec{k} \cdot \vec{x}} \psi(\vec{x}, t) \, d\vec{x}
+\]
+Apply this to the Schrödinger equation
+\[
+i \frac{\partial \hat{\psi}}{\partial t} = |\vec{k}|^2 \hat{\psi}
+\]
+and we get
+\[
+\hat{\psi}(\vec{k}, t) = \hat{\psi}(\vec{k}, 0) e^{-i |\vec{k}|^2 t}
+\]
+by separation of variables. Assume the initial condition is a delta function, such that
+\[
+\psi(\vec{x}, 0) = \delta(\vec{x})
+\]
+Thus the Fourier transform of the initial condition is 
+\[
+\hat{\psi}(\vec{k}, 0) = 1
+\]
+and 
+\[
+\hat{\psi}(\vec{k}, t) = e^{-i |\vec{k}|^2 t}. 
+\] 
+Taking the inverse Fourier transform, we get  
+\[
+\psi(\vec{x}, t) = \frac{1}{(2\pi)^n} \int_{\mathbb{R}^n} e^{i \vec{k} \cdot \vec{x}} e^{-i |\vec{k}|^2 t} \, d\vec{k}
+\]
+by completion of squares, we get
+\[
+K_t(\vec{x}) = \frac{1}{(4\pi it)^{n/2}} e^{i \frac{|\vec{x}|^2}{4t}}
+\]
+Thus we get the Schrödinger kernel representing the solution to the free Schrödinger equation with an initial delta function.
+\subsection{Part II}
+\hspace*{1.5em}To solve the Schrödinger equation with a potential term, consider the time-dependent Schrödinger equation for an atom in three-dimensional space:  
+
+\[
+-i\hbar \frac{\partial \varphi}{\partial t} = \frac{\hbar^2}{2m} \Delta \varphi + \frac{e^2}{r} \varphi. \tag{8}
+\]
+
+Here, the potential term $\frac{e^2}{r}$ depends on the distance $r = |\vec{x}|$, where $e$ is the unit charge and $m$ is the particle's mass. The constant $\hbar = \frac{h}{2\pi}$, where $h$ is Planck's constant.
+
+To simplify the analysis, first consider the harmonic one  
+
+\[
+-i \frac{\partial \varphi}{\partial t} = \frac{1}{2} \Delta \varphi. \tag{9}
+\]
+
+By separation of variables, we get
+
+\[
+\varphi(x, y, z, t) = X(x, y, z)T(t).
+\]
+
+\footnote{By convention, let \(\vec{x} = (x, y, z)^T\).}Substitute this into equation (9), we get
+
+\[
+-i X(x, y, z) T'(t) = \frac{1}{2} \Delta X(x, y, z) T(t).
+\]
+
+Divide by $X(x, y, z) T(t)$ we get
+
+\[
+-i \frac{T'(t)}{T(t)} = \frac{1}{2} \frac{\Delta X(x ,y, z)}{X(x, y, z)} = \lambda,
+\]
+
+where $\lambda$ is a separation constant. Solving the time-dependent equation gives
+
+\[
+T(t) = e^{i\lambda t}
+\]
+
+and the spatial part satisfies the relation as
+
+\[
+\Delta X(x, y, z) + 2\lambda X(x, y, z) = 0
+\]
+and this is the problematic part we'll come back to later. 
+Now we look for solutions of (9) that tend to zero as $|\vec{x}| \to \infty$, because this resembles the real-world scenario (and besides, only in this way can we get finite energy, which physically makes sense).
+
+According to the solution of the diffusion equation, which is of the same structure, the solution of (9) with the initial condition $\varphi(\vec{x}, 0) = \phi(\vec{x})$ is
+\begin{equation}
+\varphi(\vec{x}, t) = \frac{1}{(2\pi it)^{3/2}} \iiint e^{ -\frac{|\vec{x} - \vec{y}|^2}{2it} } \phi(\vec{y}) \, d\vec{y}. \tag{10}
+\end{equation}
+
+\footnote{Now, the problem of multiple solutions for the term \(\frac{1}{(2\pi it)^{3/2}}\) occurs. However, the fact is that either solution is correct, because they both makes sense in the real world scenario. (We will see something that only one of the solutions makes sense later.)}
+
+Assume that $\phi(\vec{y}) \to 0$  as $|\vec{y}| \to +\infty$, because again we want finite energy for the initial condition. 
+
+We construct a nearby equation in the form
+\[
+\frac{\partial \varphi_\epsilon}{\partial t} = \frac{\epsilon + i}{2} \Delta \varphi_\epsilon, \quad \varphi_\epsilon(\vec{x}, 0) = \phi(\vec{x}),
+\]
+and since it is a nearby equation, by continuity, we can do a continuous deformation (by letting \(\epsilon \to 0\)) to make the nearby equation converge to the original equation. 
+
+Solving the nearby equation
+\begin{equation}
+\frac{\partial \varphi_\epsilon}{\partial t} = \frac{\epsilon + i}{2} \Delta \varphi_\epsilon, \quad \varphi_\epsilon(\vec{x}, 0) = \phi(\vec{x}), \tag{11}
+\end{equation}
+whose solution depends on the real number $\epsilon > 0$, again according to the solution of the diffusion equation, we get
+\begin{equation}
+\varphi_\epsilon(\vec{x}, t) = \frac{1}{(2\pi t)^{3/2}(\epsilon + i)^{3/2}} \iiint e^{-\frac{|\vec{x} - \vec{y}|^2}{2(\epsilon + i)t} } \phi(\vec{y}) \, d\vec{y}. \tag{12}
+\end{equation}
+and $(\epsilon + i)^{1/2}$ should represent the unique square root with the positive real part. \footnote{We need to take the positive real part because otherwise the exponent 
+\[-\frac{|\vec{x} - \vec{y}|^2}{2(\epsilon + i)t} \]
+goes to infinity as $|\vec{x} - \vec{y}| \to \infty$ and we wouldn’t get a bounded solution.}
+
+Take $\epsilon \searrow 0$, we get the solution of the harmonic equation, where $i^{1/2}$ should represent the unique square root with the positive real part. 
+
+Therefore by geometrical analysis, we get
+\begin{equation*}
+\lim_{\epsilon \to 0} (\epsilon + i)^{1/2} = \frac{1 + i}{\sqrt{2}}.
+\end{equation*}
+
+Another method is to use separation of variables
+\[\varphi(\vec{x}, t) = T(t)X(\vec{x})\]
+we first try solving it in 1D
+\begin{equation}
+-2i \frac{T'}{T} = \frac{X''}{X} = -\lambda. \tag{13}
+\end{equation}
+However, we find that there are no solution for $X'' + \lambda X = 0$ that satisfy $X(x) \to 0$ as $x \to \pm\infty$. So we don't get a solution in this case. 
+\subsection{Part III}
+\hspace*{1.5em}The general time-dependent Schrödinger equation in one spatial dimension is:
+
+\[
+i \hbar \frac{\partial \varphi}{\partial t} = -\frac{\hbar^2}{2m} \frac{\partial^2 \varphi}{\partial x^2} + V(x)\varphi
+\]
+
+where \(\varphi(x, t)\) is the wave-function, \(\hbar\) is Planck's constant divided by \(2\pi\), \(m\) is the particle's mass, and \(V(x)\) is the potential energy.
+
+The harmonic oscillator potential in one dimension is:  
+
+\[
+V(x) = \frac{1}{2} m \omega^2 x^2
+\]
+
+where \(\omega\) is the oscillator's angular frequency.
+
+Substitute the harmonic potential into the Schrödinger equation, we get
+
+\[
+i \hbar \frac{\partial \varphi}{\partial t} = -\frac{\hbar^2}{2m} \frac{\partial^2 \varphi}{\partial x^2} + \frac{1}{2}m \omega^2 x^2 \varphi
+\]
+
+Setting
+\[
+\hbar = 1 \quad \text{and} \quad m = 1
+\]
+we get
+
+\[
+i \frac{\partial \varphi}{\partial t} = -\frac{1}{2} \frac{\partial^2 \varphi}{\partial x^2} + \frac{1}{2} \omega^2 x^2 \varphi
+\]
+
+If we rescale the time \(t\) such that \(\omega = 1\), we obtain the simplified equation
+
+\[
+i \frac{\partial \varphi}{\partial t} = -\frac{1}{2} \frac{\partial^2 \varphi}{\partial x^2} + \frac{1}{2} x^2 \varphi
+\]
+
+By re-scaling of the spatial terms, we get
+
+\[
+-i \frac{\partial \varphi}{\partial t} = \frac{\partial^2 \varphi}{\partial x^2} - x^2 \varphi
+\]
+\subsection{Part IV}
+\hspace*{1.5em}We now think about the quantum harmonic oscillator
+
+\[
+-i \frac{\partial \varphi}{\partial t} = \varphi_{xx} - x^2 \varphi
+\]
+Again by separation of variables, we get
+\[
+\varphi(x, t) = T(t)X(x).
+\]
+Substitute into the equation to get
+\[
+-i T'(t) X(x) = T(t)(X'' - x^2 X).
+\]
+Divide by $T(t)X(x)$, we get
+\[
+-i \frac{T'(t)}{T(t)} = \frac{X'' - x^2 X}{X} = -\lambda \tag{14}
+\]
+after absorbing the constant into \(X(x)\), the time-dependent function is
+\[
+T(t) = e^{i\lambda t}
+\]
+and spatial part of the equation becomes
+\[
+X'' + (\lambda - x^2)X = 0. \tag{15}
+\]
+The differential equation (15) has a variable coefficient, complicating its solution. Consider the special case $\lambda = 1$, where the solution is
+\[
+X(\vec{x}) = e^{-x^2/2}
+\]
+For general $\lambda$, by substitution, let
+\[
+X(x) = w(x)e^{-x^2/2}.
+\]
+Substitute into (15), we get
+\[
+\left(w'' - 2xw' + (x^2 - 1)w\right)e^{-x^2/2} = (x^2 - \lambda)e^{-x^2/2}w.
+\]
+Dividing by $e^{-x^2/2}$, we get
+\[
+w'' - 2xw' + (\lambda - 1)w = 0. \tag{16}
+\]
+To solve (16), assume the solution \(w(x)\) has the form of a power series, that
+
+\[w(x) = \sum_{n=0}^\infty a_n x^n\]
+where \(a_n\) are coefficients to be calculated. Differentiate \(w(x)\), we get
+\[w'(x) = \sum_{n=1}^\infty n a_n x^{n-1}\]
+and
+\[w''(x) = \sum_{n=2}^\infty n(n-1) a_n x^{n-2}\]
+Substitute \(w(x), w'(x)\), and \(w''(x)\) into (16), we get
+\[\sum_{n=2}^\infty n(n-1)a_nx^{n-2} - 2x\sum_{n=1}^\infty n a_n x^{n-1} + (\lambda - 1)\sum_{n=0}^\infty a_n x^n = 0\]
+Rewrite \(w''(x)\) into powers of \(x^n\), we get
+\[\sum_{n=2}^\infty n(n-1)a_nx^{n-2} = \sum_{n=0}^\infty (n+2)(n+1)a_{n+2}x^n,\]
+\[-2x\sum_{n=1}^\infty n a_n x^{n-1} = -2\sum_{n=0}^\infty (n+1)a_{n+1}x^n\]
+Therefore, 
+
+\[\sum_{n=0}^\infty \left[(n+2)(n+1)a_{n+2} - 2(n+1)a_{n+1} + (\lambda - 1)a_n \right]x^n = 0\]
+\[-2\sum_{n=1}^\infty n a_n x^n = -2\sum_{n=0}^\infty (n+1)a_{n+1}x^n\]
+Now the equation is
+\[\sum_{n=0}^\infty \left[(n+2)(n+1)a_{n+2} - 2(n+1)a_{n+1} + (\lambda - 1)a_n \right]x^n = 0\]
+For this equality to hold for all \(x^n\), the coefficient of each power of \(x^n\) must vanish
+
+\[(n+2)(n+1)a_{n+2} - 2(n+1)a_{n+1} + (\lambda - 1)a_n = 0 \tag{17}\]
+
+From (17), solve for \(a_{n+2}\) to get
+\[a_{n+2} = \frac{2(n+1)a_{n+1} - (\lambda - 1)a_n}{(n+2)(n+1)} \tag{18}\]
+
+This recurrence relation can define the coefficients \(a_n\).
+
+The series will terminate (become a polynomial) if \(a_n = 0\) for \(n > N\). For this to happen, \(\lambda\) must take specific values. Specifically, when \(\lambda = 2n + 1\), the series terminates, and \(w(x)\) is a polynomial of degree \(n\).
+
+And then we get to \textit{Hermite's differential equation}, with solutions called Hermite polynomials $H_n(x)$ for integer $n$. The energy levels of the harmonic oscillator are given by
+\[
+E_n = \lambda_n = 2n + 1.
+\]
+Thus, solving (16) reveals the quantized energy levels corresponding to the harmonic oscillator.
+\footnote{The first two, $a_0$ and $a_1$, are arbitrary. If $a_0 = 0$, the solution is an odd function; if $a_1 = 0$, the solution is even.
+
+For example, if $\lambda = 2k+1$ for some integer $k$, (18) shows that \[a_{k+2} = 0\]
+\[a_{k+4} = 0\]
+ and so on. Then we get an even or an odd polynomial (depending on whether $k$ is even or odd) of degree $k$. 
+ 
+ For example, the first several Hermite polynomials are
+\[H_0(x)  = 1 \quad (\lambda = 1, a_1 = a_2 = 0), \]
+\[H_1(x)  = 2x \quad (\lambda = 3, a_0 = a_3 = 0), \]
+\[H_2(x)  = 4x^2 - 2 \quad (\lambda = 5, a_1 = a_4 = 0), \]
+\[H_3(x)  = 8x^3 - 12x \quad (\lambda = 7, a_0 = a_5 = 0), \]
+\[H_4(x)  = 16x^4 - 48x^2 + 12 \quad (\lambda = 9, a_1 = a_6 = 0) \]
+\[
+H_5(x) = 32x^5 - 160x^3 + 120x \quad (\lambda = 11, a_2 = a_7 = 0),
+\]
+\[
+H_6(x) = 64x^6 - 480x^4 + 720x^2 - 120 \quad (\lambda = 13, a_1 = a_8 = 0),
+\]
+\[
+H_7(x) = 128x^7 - 1344x^5 + 3360x^3 - 1680x \quad (\lambda = 15, a_0 = a_9 = 0),
+\]
+\[
+H_8(x) = 256x^8 - 3584x^6 + 13440x^4 - 13440x^2 + 1680 \quad (\lambda = 17, a_1 = a_{10} = 0),
+\]
+\[
+H_9(x) = 512x^9 - 9216x^7 + 48384x^5 - 80640x^3 + 30240x \quad (\lambda = 19, a_2 = a_{11} = 0).
+\]
+}
+Thus we have found some separated solutions of equation (15) of the form
+\[
+X_k(x) = H_k(x)e^{-x^2/2} \quad \text{if } \lambda = 2k+1.
+\]
+The corresponding solutions of (14) are
+\[
+\varphi_k(x, t) = e^{-i(2k+1)t}H_k(x)e^{-x^2/2}
+\]
+for $k = 0, 1, 2, \ldots$. And we indeed have $\varphi_k(x, t) \to 0$ as $x \to \infty$ . 
+
+Claim: if $\lambda \neq 2k+1$, no power series solution can satisfy the condition at infinity, and therefore the only eigenvalues (energy levels) are the positive odd integers. 
+\footnote{When \(\lambda \neq 2k+1\), the recursion does not terminate, so the series does not truncate to a polynomial. The solution remains an infinite power series.}
+\subsection{Part V}
+Schr\"odinger's equation for Hydrogen atom is 
+\[i\varphi_t = -\frac{1}{2} \Delta \varphi - \frac{1}{r} \varphi\]
+\footnote{This is an equation in dimension 3. }and again we set \[e = m = \hbar = 1\]
+note that \(r\) represents the distance from the position of the particle to the origin \[r = |\vec{x}| = (x^2 + y^2 + z^2)^{\frac{1}{2}}\]
+and since we need the total energy to be finite, we have 
+\[\int_{\mathbb{R}^3} |\varphi(\vec{x}, t)|^2 d\vec{x} < +\infty\]
+By separation of variables, let 
+\[\varphi(\vec{x}, t) = X(\vec{x}) T(t)\]
+we get 
+\[2i \frac{T'}{T} = \frac{-\Delta X - \frac{2}{r}X}{X} = \lambda\]
+for some constant \(\lambda\). We therefore get, after absorbing the constant of \(T\) into \(X\), \[T(t) = e^{-i\frac{\lambda t}{2}}\]
+
+Therefore, after plugging in the time-dependent function \(T\), we get 
+\[\varphi(\vec{x}, t) = X(\vec{x}) e^{-i\frac{\lambda t}{2}}\]
+and for the spacial function, we get 
+\[-\Delta X - \frac{2}{r} X = \lambda X \tag{19}\]
+In order to solve this ODE, we make the function \(v\) to be spherically symmetric (which actually makes sense because the potential energy is the same so long as the distance between the particles are the same), so that we let \[X(\vec{x}) = R(r)\]
+and re-writing the previous ODE, we get
+\[-R_{rr} - \frac{2}{r}R_r - \frac{2}{r}R = \lambda R \tag{20}\]
+and since \(R\) is in the Schwartz class, we have the following inequality
+\[\int_0^{+\infty} |R|^2 r^2 dr < +\infty \]
+By spherical symmetry, rewrite \( R(r) \) in terms of \( u(r) \) as:
+\[
+R(r) = \frac{u(r)}{r}
+\]
+Substitute this into equation (20), we get 
+\[
+R_r = \frac{u'(r)}{r} - \frac{u(r)}{r^2} \]
+\[R_{rr} = \frac{u''(r)}{r} - \frac{2u'(r)}{r^2} + \frac{2u(r)}{r^3}
+\]
+Substituting into (20), we get
+\[
+-\left( \frac{u''(r)}{r} - \frac{2u'(r)}{r^2} + \frac{2u(r)}{r^3} \right) 
+- \frac{2}{r} \left( \frac{u'(r)}{r} - \frac{u(r)}{r^2} \right) 
+- \frac{2}{r} \cdot \frac{u(r)}{r} = \lambda \frac{u(r)}{r}.
+\]
+By simplification, we get
+\begin{align*}
+-\frac{u''(r)}{r} + \frac{2u'(r)}{r^2} - \frac{2u(r)}{r^3}
+- \frac{2u'(r)}{r^2} + \frac{2u(r)}{r^3}
+- \frac{2u(r)}{r^3} &= \lambda \frac{u(r)}{r}
+\end{align*}
+
+\[
+-\frac{u''(r)}{r} = \lambda \frac{u(r)}{r}
+\]
+
+Multiply both sides by \( r \) (\( r > 0 \)), we get
+\[
+-u''(r) = \lambda u(r)
+\]
+Therefore, we have
+\[
+u''(r) + \lambda u(r) = 0 \tag{21}
+\]
+The general solution of (21) is
+\[
+u(r) = A e^{\sqrt{-\lambda} r} + B e^{-\sqrt{-\lambda} r}
+\]
+Therefore, we get the approximate solution of \(R\) as \[R(r) \approx e^{+\beta r}\]
+where 
+\[\lambda = -\beta ^2 = -\frac{1}{n^2}\]
+\section{References}
+Strauss, \textit{Partial Differential Equations: An Introduction}. 2nd edition. \\https://benjaminliupenrose.me/archives/assets/MATH4220/book.pdf \\
+Accessed 30th November, 2024. 
+
+\noindent
+Schrödinger, E. (1926). "\textit{An Undulatory Theory of the Mechanics of Atoms and Molecules}". Physical Review. 28 (6): 1049–70. 
+
+\noindent
+Evans, L. \textit{Partial Differential Equations}. 2nd edition. https://math24.wordpress.com/wp-content/uploads/2013/02/partial-differential-equations-by-evans.pdf \\
+Accessed 30th November, 2024. 
+
+\end{document}
